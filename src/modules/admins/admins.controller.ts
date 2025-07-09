@@ -32,7 +32,7 @@ export class AdminsController {
 
 
   @Roles(Role.ADMIN)
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard
   @Get('me')
   async getMe(@Req() req: Request) {
     return await this.adminsService.getMe(req.user.id);
