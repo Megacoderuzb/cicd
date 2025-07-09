@@ -1,0 +1,31 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: 138.128.241.134
+          username: root
+          password: Muhammadjon7701
+          script: |
+            cd cicd
+
+            # GitHub tokenni avtomatik ulash uchun .netrc fayl yaratamiz
+            echo "machine github.com login Megacoderuzb password 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" > ~/.netrc
+
+            git pull
+            npm install
+            npm run build
+            pm2 restart all
