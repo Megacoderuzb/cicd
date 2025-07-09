@@ -23,10 +23,6 @@ export class AdminsService {
     return data;
   }
 
-    async getMsg() {
-    return {
-      message: 'Hello from CI\CD',};
-  }
 
   async getMe(id: number) {
     const data = await this.adminModel.findById(id);
