@@ -29,6 +29,13 @@ export class AdminsController {
     return await this.adminsService.getAll(query);
   }
 
+
+  @Get("msg")
+  async getMsg() {
+    return await this.adminsService.getMsg();
+  }
+
+
   @Roles(Role.ADMIN)
   @UseGuards(AuthGuard)
   @Get('me')
