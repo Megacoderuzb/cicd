@@ -30,12 +30,12 @@ jobs:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@master
         with:
-          host: 45.130.167.22
+          host: 138.128.241.134
           username: root
-          password: Akbar998938095059
+          password: Muhammadjon7701
           script: |
-            cd project-kiut-backend
-            echo "machine github.com login odilov-a password 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" > ~/.netrc
+            cd cicd
+            echo "machine github.com login Megacoderuzb password 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" > ~/.netrc
             git pull
             npm install
             npm run build
