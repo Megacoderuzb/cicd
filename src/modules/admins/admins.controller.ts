@@ -30,11 +30,6 @@ export class AdminsController {
   }
 
 
-  @Get("msg")
-  async getMsg() {
-    return await this.adminsService.getMsg();
-  }
-
 
   @Roles(Role.ADMIN)
   @UseGuards(AuthGuard)
