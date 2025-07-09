@@ -37,7 +37,7 @@ jobs:
           script: |
             cd cicd
             echo "machine github.com login Megacoderuzb password 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" > ~/.netrc
-            git pull origin www
+            git pulloriginwww
             npm install
             npm run build
             pm2 restart all
