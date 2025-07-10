@@ -9,11 +9,16 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
+    env:
+      TELEGRAM_BOT_TOKEN: 8001007521:AAHiFMtf-GippKEHqsaLTr81VtP7k1b-Kco
+      TELEGRAM_CHAT_ID: -1002513646170
+      TIMEOUT: 10
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Deploy via SSH
+      - name: Deploy via SSH (with build‑conditional Telegram)
         uses: appleboy/ssh-action@master
         with:
           host: 138.128.241.134
@@ -21,23 +26,34 @@ jobs:
           password: Muhammadjon7701
           script: |
             cd cicd
+            # allow git pull over HTTPS
             echo "machine github.com login Megacoderuzb password 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" > ~/.netrc
             git pull
             npm install
+
             if npm run build; then
-              MESSAGE="✅ *Build SUCCESS & Deployed*%0A%0A*Repository:* Megacoderuzb/cicd%0A*Branch:* main%0A*Time:* $(date '+%Y-%m-%d %H:%M:%S')"
-              curl -s -X POST "https://api.telegram.org/bot8001007521:AAHiFMtf-GippKEHqsaLTr81VtP7k1b-Kco/sendMessage" \
-                -d chat_id=-1002513646170 \
-                -d "parse_mode=Markdown" \
-                -d "disable_web_page_preview=true" \
-                -d text="$MESSAGE"
+              MESSAGE="✅ *Build & Deploy SUCCESS*%0A%0A\
+*Repository:* ${{ github.repository }}%0A\
+*Branch:* ${{ github.ref_name }}%0A\
+*Commit message:* ${{ github.event.head_commit.message }}%0A\
+*Commit ID:* ${{ github.sha }}"
+              curl -s --max-time $TIMEOUT -X POST "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage" \
+                   -d chat_id=$TELEGRAM_CHAT_ID \
+                   -d parse_mode=Markdown \
+                   -d disable_web_page_preview=true \
+                   -d text="$MESSAGE"
             else
-              MESSAGE="❌ *Build FAILED*%0A%0A*Repository:* Megacoderuzb/cicd%0A*Branch:* main%0A*Time:* $(date '+%Y-%m-%d %H:%M:%S')"
-              curl -s -X POST "https://api.telegram.org/bot8001007521:AAHiFMtf-GippKEHqsaLTr81VtP7k1b-Kco/sendMessage" \
-                -d chat_id=-1002513646170 \
-                -d "parse_mode=Markdown" \
-                -d "disable_web_page_preview=true" \
-                -d text="$MESSAGE"
+              MESSAGE="❌ *Build & Deploy FAILED*%0A%0A\
+*Repository:* ${{ github.repository }}%0A\
+*Branch:* ${{ github.ref_name }}%0A\
+*Commit message:* ${{ github.event.head_commit.message }}%0A\
+*Commit ID:* ${{ github.sha }}"
+              curl -s --max-time $TIMEOUT -X POST "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage" \
+                   -d chat_id=$TELEGRAM_CHAT_ID \
+                   -d parse_mode=Markdown \
+                   -d disable_web_page_preview=true \
+                   -d text="$MESSAGE"
               exit 1
             fi
+
             pm2 restart all
