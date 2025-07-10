@@ -1,4 +1,4 @@
-name: Deploy to VPS
+name: Deploy React Frontend to VPS
 
 on:
   push:
@@ -9,24 +9,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    env:
-      TELEGRAM_BOT_TOKEN: 8001007521:AAHiFMtf-GippKEHqsaLTr81VtP7k1b-Kco
-      TELEGRAM_CHAT_ID: 5587555979
-      TIMEOUT: 10
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
-
-      - name: Send Telegram Notification - Deployment Started
-        run: |
-          MESSAGE="🚀 *Deploy started*%0A%0A*Repository:* ${{ github.repository }}%0A*Branch:* ${{ github.ref_name }}%0A*Commit message:* ${{ github.event.head_commit.message }}%0A*Commit ID:* ${{ github.sha }}%0A*User:* ${{ github.actor }}%0A*Workflow:* ${{ github.workflow }}%0A*Run:* https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          echo "Sending message: $MESSAGE"
-          curl -s --max-time $TIMEOUT -X POST "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage" \
-            -d "chat_id=$TELEGRAM_CHAT_ID" \
-            -d "disable_web_page_preview=true" \
-            -d "parse_mode=Markdown" \
-            -d "text=$MESSAGE"
 
       - name: Deploy via SSH
         uses: appleboy/ssh-action@master
@@ -36,30 +21,21 @@ jobs:
           password: Muhammadjon7701
           script: |
             cd cicd
+
             echo "machine github.com login Megacoderuzb password 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" > ~/.netrc
+
             git pull
             npm install
-            npm run build
+
+            if npm run build; then
+              curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+                -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+                -d text="✅ Build SUCCESS and deployed"
+            else
+              curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+                -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+                -d text="❌ Build FAILED"
+              exit 1
+            fi
+
             pm2 restart all
-
-      - name: Send Telegram Notification - Deployment Finished
-        if: success()
-        run: |
-          MESSAGE="✅ *Deploy successful*%0A%0A*Repository:* ${{ github.repository }}%0A*Branch:* ${{ github.ref_name }}%0A*Commit message:* ${{ github.event.head_commit.message }}%0A*Commit ID:* ${{ github.sha }}%0A*User:* ${{ github.actor }}%0A*Workflow:* ${{ github.workflow }}%0A*Run:* https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          echo "Sending message: $MESSAGE"
-          curl -s --max-time $TIMEOUT -X POST "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage" \
-            -d "chat_id=$TELEGRAM_CHAT_ID" \
-            -d "disable_web_page_preview=true" \
-            -d "parse_mode=Markdown" \
-            -d "text=$MESSAGE"
-
-      - name: Send Telegram Notification - Deployment Failed
-        if: failure()
-        run: |
-          MESSAGE="❌ *Deploy failed*%0A%0A*Repository:* ${{ github.repository }}%0A*Branch:* ${{ github.ref_name }}%0A*Commit message:* ${{ github.event.head_commit.message }}%0A*Commit ID:* ${{ github.sha }}%0A*User:* ${{ github.actor }}%0A*Workflow:* ${{ github.workflow }}%0A*Run:* https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          echo "Sending message: $MESSAGE"
-          curl -s --max-time $TIMEOUT -X POST "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage" \
-            -d "chat_id=$TELEGRAM_CHAT_ID" \
-            -d "disable_web_page_preview=true" \
-            -d "parse_mode=Markdown" \
-            -d "text=$MESSAGE"
