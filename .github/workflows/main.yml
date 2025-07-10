@@ -1,4 +1,4 @@
-name: Deploy  to VPS
+name: Deploy React Frontend to VPS
 
 on:
   push:
@@ -27,14 +27,30 @@ jobs:
             git pull
             npm install
 
+            REPO_NAME="${{ github.repository }}"
+            ACTOR="${{ github.actor }}"
+            COMMIT_MESSAGE="${{ github.event.head_commit.message }}"
+            COMMIT_SHA="${{ github.sha }}"
+            COMMIT_URL="https://github.com/${{ github.repository }}/commit/${{ github.sha }}"
+
             if npm run build; then
               curl -s -X POST "https://api.telegram.org/bot8001007521:AAHiFMtf-GippKEHqsaLTr81VtP7k1b-Kco/sendMessage" \
                 -d chat_id=-1002513646170 \
-                -d text="✅ Build SUCCESS and deployed"
+                -d text="✅ *Build SUCCESS and deployed*
+                  📦 *Repo*: ${REPO_NAME}
+                  👤 *Pushed by*: ${ACTOR}
+                  📝 *Commit*: ${COMMIT_MESSAGE}
+                  🔗 [View Commit](${COMMIT_URL})" \
+                -d parse_mode=Markdown
             else
               curl -s -X POST "https://api.telegram.org/bot8001007521:AAHiFMtf-GippKEHqsaLTr81VtP7k1b-Kco/sendMessage" \
                 -d chat_id=-1002513646170 \
-                -d text="❌ Build FAILED"
+                -d text="❌ *Build FAILED*
+                  📦 *Repo*: ${REPO_NAME}
+                  👤 *Pushed by*: ${ACTOR}
+                  📝 *Commit*: ${COMMIT_MESSAGE}
+                  🔗 [View Commit](${COMMIT_URL})" \
+                -d parse_mode=Markdown
               exit 1
             fi
 
