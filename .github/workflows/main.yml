@@ -21,21 +21,23 @@ jobs:
           password: Muhammadjon7701
           script: |
             cd cicd
-
             echo "machine github.com login Megacoderuzb password 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" > ~/.netrc
-
             git pull
             npm install
-
             if npm run build; then
+              MESSAGE="✅ *Build SUCCESS & Deployed*%0A%0A*Repository:* Megacoderuzb/cicd%0A*Branch:* main%0A*Time:* $(date '+%Y-%m-%d %H:%M:%S')"
               curl -s -X POST "https://api.telegram.org/bot8001007521:AAHiFMtf-GippKEHqsaLTr81VtP7k1b-Kco/sendMessage" \
                 -d chat_id=5587555979 \
-                -d text="✅ Build SUCCESS and deployed"
+                -d "parse_mode=Markdown" \
+                -d "disable_web_page_preview=true" \
+                -d text="$MESSAGE"
             else
+              MESSAGE="❌ *Build FAILED*%0A%0A*Repository:* Megacoderuzb/cicd%0A*Branch:* main%0A*Time:* $(date '+%Y-%m-%d %H:%M:%S')"
               curl -s -X POST "https://api.telegram.org/bot8001007521:AAHiFMtf-GippKEHqsaLTr81VtP7k1b-Kco/sendMessage" \
                 -d chat_id=5587555979 \
-                -d text="❌ Build FAILED"
+                -d "parse_mode=Markdown" \
+                -d "disable_web_page_preview=true" \
+                -d text="$MESSAGE"
               exit 1
             fi
-
             pm2 restart all
