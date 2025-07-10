@@ -65,5 +65,4 @@ export class UsersController {
   @Delete()
   remove(@Req() req: Request) {
     return this.usersService.remove(req.user.id);
-  }
-}
+
