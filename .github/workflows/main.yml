@@ -27,14 +27,14 @@ jobs:
             if npm run build; then
               MESSAGE="✅ *Build SUCCESS & Deployed*%0A%0A*Repository:* Megacoderuzb/cicd%0A*Branch:* main%0A*Time:* $(date '+%Y-%m-%d %H:%M:%S')"
               curl -s -X POST "https://api.telegram.org/bot8001007521:AAHiFMtf-GippKEHqsaLTr81VtP7k1b-Kco/sendMessage" \
-                -d chat_id=5587555979 \
+                -d chat_id=-1002513646170 \
                 -d "parse_mode=Markdown" \
                 -d "disable_web_page_preview=true" \
                 -d text="$MESSAGE"
             else
               MESSAGE="❌ *Build FAILED*%0A%0A*Repository:* Megacoderuzb/cicd%0A*Branch:* main%0A*Time:* $(date '+%Y-%m-%d %H:%M:%S')"
               curl -s -X POST "https://api.telegram.org/bot8001007521:AAHiFMtf-GippKEHqsaLTr81VtP7k1b-Kco/sendMessage" \
-                -d chat_id=5587555979 \
+                -d chat_id=-1002513646170 \
                 -d "parse_mode=Markdown" \
                 -d "disable_web_page_preview=true" \
                 -d text="$MESSAGE"
